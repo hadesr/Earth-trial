@@ -1,0 +1,10 @@
+user.name=Ritik Mandal
+user.email=ritik02mandal@gmail.com
+color.ui=true
+core.editor=emacs
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+remote.origin.url=https://github.com/elec-atom/Earth.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
