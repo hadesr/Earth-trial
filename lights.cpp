@@ -46,18 +46,32 @@ int main(int argc, char** argv)
 opengl::initGL();
 
 glm::vec3 sunPos(-10.0f, -10.0f, -10.0f);
+glm::vec3 sunDir(10.0f, 10.0f, 10.0f);
+
 glm::vec3 earthPos(1.0f, 1.0f, 1.0f);
 
-Shader lampShader("Shader/light_vs.glsl","Shader/light_fs.glsl");
-Sphere sphere(2);
+Shader earthShader("Shader/earth_vs.glsl","Shader/earth_fs.glsl");
+Shader sunShader("Shader/sun_vs.glsl","Shader/sun_fs.glsl");
+
+Sphere earth(2);
 Sphere sun(1);
 
 unsigned int loadTexture(const char *path);
-unsigned int Map= loadTexture("Texture/earth.jpg");
-unsigned int sun_tex=loadTexture("Texture/sun.jpg");
 
-sphere.texture(Map);
+unsigned int earth_tex= loadTexture("Texture/earth.jpg");
+unsigned int sun_tex=loadTexture("Texture/sun.jpg");
+unsigned int earth_spec_map=loadTexture("Texture/EarthSpec.png");
+
+
+earth.texture(earth_tex);
+earth.specular_map(earth_spec_map);
 sun.texture(sun_tex);
+
+earthShader.use();
+earthShader.setInt("material.diffuse", 0);
+earthShader.setInt("material.specular", 1);
+earthShader.setFloat("material.shininess", 0.0f);
+
 
   while (glfwWindowShouldClose(window) == 0)
     { 
@@ -83,21 +97,52 @@ sun.texture(sun_tex);
       model = glm::mat4(1.0f);
       model = glm::translate(model, earthPos);
           
-      lampShader.use();
+      earthShader.use();
 
-      lampShader.setMat4("model", model);
-      lampShader.setMat4("projection", projection);
-      lampShader.setMat4("view", view);
+      earthShader.setMat4("model", model);
+      earthShader.setMat4("projection", projection);
+      earthShader.setMat4("view", view);
 
-      sphere.draw();
 
+
+      // directional light
+      earthShader.setInt("dirLight.status",dirLight);
+      earthShader.setVec3("dirLight.direction", sunDir);
+      earthShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+      earthShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+      earthShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+
+
+      // spotLight
+      earthShader.setInt("spotLight.status", spotLight);
+      earthShader.setVec3("spotLight.position", camera.Position);
+      earthShader.setVec3("spotLight.direction", camera.Front);
+      earthShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+      earthShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+      earthShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+      earthShader.setFloat("spotLight.constant", 1.0f);
+      earthShader.setFloat("spotLight.linear", 0.09);
+      earthShader.setFloat("spotLight.quadratic", 0.032);
+      earthShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
+      earthShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));     
+      
+      earthShader.setVec3("viewPos", camera.Position);
+
+      earthShader.setInt("blinn", blinn);
+
+
+      earth.draw();
+
+      sunShader.use();
 
       model = glm::mat4(1.0f);
       model = glm::translate(model, sunPos);
       model = glm::scale(model, glm::vec3(0.5f));
 
-      lampShader.setMat4("model", model);
+      sunShader.setMat4("model", model);
 
+      sunShader.setMat4("projection", projection);
+      sunShader.setMat4("view", view);
 
       sun.draw();
 
@@ -105,7 +150,7 @@ sun.texture(sun_tex);
       glfwSwapBuffers(window);
       glfwPollEvents();
     }
-  sphere.exit();
+  earth.exit();
   sun.exit();
 
   glfwTerminate();

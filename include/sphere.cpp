@@ -4,6 +4,9 @@ class Sphere
     GLuint sphere_vbo[4];//={-1,-1,-1,-1};
     GLuint sphere_vao[4];//={-1,-1,-1,-1};
 
+unsigned int spec_ava = 0;
+unsigned int spec_map;
+
 unsigned int texture_ava = 0;
 unsigned int map;
 
@@ -11,20 +14,25 @@ unsigned int stack=100;
 unsigned int sector=100;
 
 GLfloat pos[101*101*3];
+GLfloat normal[101*101*3];
 GLfloat tex_coord[101*101*2];
 
 unsigned int indi[100*100*6];
 
 Sphere(int radius)
     {
-        unsigned int k=0,l=0,s,t;
+        unsigned int k=0,l=0,m=0,s,t;
         for(int i=0;i<=stack;i++)
         {
             for(int j=0;j<=sector;j++)
             {
-                pos[k++]=cos(M_PI*i/stack);                             //position of z
-                pos[k++]=sin(M_PI*i/stack)*sin(2*M_PI*j/sector);          //position of y
-                pos[k++]=sin(M_PI*i/stack)*cos(2*M_PI*j/sector);          //position of x
+                pos[k++]=radius*cos(M_PI*i/stack);                               //position of z
+                pos[k++]=radius*sin(M_PI*i/stack)*sin(2*M_PI*j/sector);          //position of y
+                pos[k++]=radius*sin(M_PI*i/stack)*cos(2*M_PI*j/sector);          //position of x
+
+                normal[m++]=cos(M_PI*i/stack);                               //position of z
+                normal[m++]=sin(M_PI*i/stack)*sin(2*M_PI*j/sector);          //position of y
+                normal[m++]=sin(M_PI*i/stack)*cos(2*M_PI*j/sector);          //position of x
 
                 tex_coord[l++]= (float)j / sector;
                 tex_coord[l++]= (float)i / stack;
@@ -67,7 +75,13 @@ Sphere(int radius)
         glEnableVertexAttribArray(i);
         glVertexAttribPointer(i,2,GL_FLOAT,GL_FALSE,0,0);
 
-        i=2; // indices
+        i=2; // normal
+        glBindBuffer(GL_ARRAY_BUFFER,sphere_vbo[i]);
+        glBufferData(GL_ARRAY_BUFFER,sizeof(normal),normal,GL_STATIC_DRAW);
+        glEnableVertexAttribArray(i);
+        glVertexAttribPointer(i,3,GL_FLOAT,GL_FALSE,0,0);
+
+        i=3; // indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,sphere_vbo[i]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indi),indi,GL_STATIC_DRAW);
         glEnableVertexAttribArray(i);
@@ -87,6 +101,7 @@ Sphere(int radius)
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);
+        glDisableVertexAttribArray(3);
         }
 
     void texture(unsigned int m)
@@ -94,6 +109,13 @@ Sphere(int radius)
             map=m;
             texture_ava=1;
         }
+
+    void specular_map(unsigned int m)
+    {
+        spec_map=m;
+        spec_ava=1;
+
+    }
     
 
     void sphere_draw()
@@ -109,6 +131,11 @@ Sphere(int radius)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, map);
 
+        if(spec_ava)
+        {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, spec_map);
+        }
         glDrawElements(GL_TRIANGLES,sizeof(indi)/sizeof(GLuint),GL_UNSIGNED_INT,0);    // indices (choose just one line not both !!!)
         glBindVertexArray(0);
         }
