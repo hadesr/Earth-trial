@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 //Here beings the game
 opengl::initGL();
 
-glm::vec3 sunPos(-10.0f, -10.0f, -10.0f);
+glm::vec3 sunPos(-1.0f, -1.0f, -1.0f);
 glm::vec3 sunDir(10.0f, 10.0f, 10.0f);
 
 glm::vec3 earthPos(1.0f, 1.0f, 1.0f);
@@ -111,6 +111,15 @@ earthShader.setFloat("material.shininess", 0.0f);
       earthShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
       earthShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 
+      // point light
+      earthShader.setInt("pointLight.status", pointLight);
+      earthShader.setVec3("pointLight.position", sunPos);
+      earthShader.setVec3("pointLight.ambient", 0.05f, 0.05f, 0.05f);
+      earthShader.setVec3("pointLight.diffuse", 0.8f, 0.8f, 0.8f);
+      earthShader.setVec3("pointLight.specular", 1.0f, 1.0f, 1.0f);
+      earthShader.setFloat("pointLight.constant", 1.0f);
+      earthShader.setFloat("pointLight.linear", 0.09);
+      earthShader.setFloat("pointLight.quadratic", 0.032);
 
       // spotLight
       earthShader.setInt("spotLight.status", spotLight);
