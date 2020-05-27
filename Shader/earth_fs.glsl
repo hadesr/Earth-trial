@@ -3,9 +3,9 @@
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D normal;
     float shininess;
 };
-
 
 struct DirLight {
     vec3 direction;
@@ -32,9 +32,11 @@ struct SpotLight {
     bool status;
 };
 
-in vec3 vs_position;
+in vec3 FragPos;
 in vec2 TexCoords;
-in vec3 vs_normal;
+in vec3 Normal;
+in mat3 TBN;
+
 
 out vec4 FragColor;
 
@@ -43,40 +45,42 @@ uniform DirLight dirLight;
 uniform SpotLight spotLight;
 uniform Material material;
 uniform bool blinn;
+uniform bool np;
 
 
 // function prototypes
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
-
-
 void main()
 {    
-    vec3 normal = vs_normal;
+    vec3 normal = Normal;
+
+    if(np)
+    {
+    	normal = texture(material.normal, TexCoords).rgb;
+    	normal = normal * 2.0 - 1.0;   
+    	normal = normalize(TBN * normal);
+    }
 
     // properties
-    vec3 viewDir = normalize(viewPos - vs_position);
+    vec3 viewDir = normalize(viewPos - FragPos);
     vec3 result=vec3(0.0);
     
     // phase 1: directional lighting
-    
     if(dirLight.status)
     {
-    result = CalcDirLight(dirLight, normal, viewDir);
+    	result = CalcDirLight(dirLight, normal, viewDir);
     }
-
+    
     // phase 3: spot light
     if(spotLight.status)
     {
-    result += CalcSpotLight(spotLight, normal, vs_position, viewDir);    
+    	result += CalcSpotLight(spotLight, normal, FragPos, viewDir);    
     }
 
     FragColor = vec4(result, 1.0);
 }
-
-
-
 
 
 // calculates the color when using a directional light.

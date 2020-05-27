@@ -59,17 +59,19 @@ Sphere sun(1);
 unsigned int loadTexture(const char *path);
 
 unsigned int earth_tex= loadTexture("Texture/earth.jpg");
+//unsigned int earth_spec_map=loadTexture("Texture/EarthSpec.png");
+unsigned int earth_norm_map=loadTexture("Texture/earthNormal.png");
 unsigned int sun_tex=loadTexture("Texture/sun.jpg");
-unsigned int earth_spec_map=loadTexture("Texture/EarthSpec.png");
-
 
 earth.texture(earth_tex);
-earth.specular_map(earth_spec_map);
+//earth.specular_map(earth_spec_map);
+earth.normal_map(earth_norm_map);
 sun.texture(sun_tex);
 
 earthShader.use();
 earthShader.setInt("material.diffuse", 0);
 earthShader.setInt("material.specular", 1);
+earthShader.setInt("material.norm", 2);
 earthShader.setFloat("material.shininess", 0.0f);
 
 
@@ -85,15 +87,11 @@ earthShader.setFloat("material.shininess", 0.0f);
       glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-      
-
       //Matrices to be used
       glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
       glm::mat4 view = camera.GetViewMatrix();
       glm::mat4 model = glm::mat4(1.0f);
       
-
-
       model = glm::mat4(1.0f);
       model = glm::translate(model, earthPos);
           
@@ -102,8 +100,9 @@ earthShader.setFloat("material.shininess", 0.0f);
       earthShader.setMat4("model", model);
       earthShader.setMat4("projection", projection);
       earthShader.setMat4("view", view);
-
-
+      earthShader.setVec3("direction", sunDir);
+      earthShader.setVec3("cpos", camera.Position);
+      earthShader.setVec3("ligpos", camera.Position);
 
       // directional light
       earthShader.setInt("dirLight.status",dirLight);
@@ -129,7 +128,7 @@ earthShader.setFloat("material.shininess", 0.0f);
       earthShader.setVec3("viewPos", camera.Position);
 
       earthShader.setInt("blinn", blinn);
-
+      earthShader.setInt("np", np);
 
       earth.draw();
 
