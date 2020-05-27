@@ -45,8 +45,8 @@ int main(int argc, char** argv)
 //Here beings the game
 opengl::initGL();
 
-glm::vec3 sunPos(-1.0f, -1.0f, -1.0f);
-glm::vec3 sunDir(10.0f, 10.0f, 10.0f);
+glm::vec3 sunPos(-90.0f,0.0f,0.0f);
+glm::vec3 sunDir(90.0f,0.0f,0.0f);
 
 glm::vec3 earthPos(1.0f, 1.0f, 1.0f);
 
@@ -67,13 +67,6 @@ earth.texture(earth_tex);
 //earth.specular_map(earth_spec_map);
 //earth.normal_map(earth_norm_map);
 sun.texture(sun_tex);
-
-earthShader.use();
-earthShader.setInt("material.diffuse", 0);
-earthShader.setInt("material.specular", 1);
-earthShader.setInt("material.norm", 2);
-earthShader.setFloat("material.shininess", 0.0f);
-
 
   while (glfwWindowShouldClose(window) == 0)
     { 
@@ -100,9 +93,17 @@ earthShader.setFloat("material.shininess", 0.0f);
       earthShader.setMat4("model", model);
       earthShader.setMat4("projection", projection);
       earthShader.setMat4("view", view);
-      earthShader.setVec3("direction", sunDir);
-      earthShader.setVec3("cpos", camera.Position);
-      earthShader.setVec3("ligpos", camera.Position);
+
+
+//      earthShader.setVec3("direction", sunDir);
+//      earthShader.setVec3("cpos", camera.Position);
+//      earthShader.setVec3("ligpos", camera.Position);
+      
+      //material properties
+      earthShader.setInt("material.diffuse", 0);
+      earthShader.setInt("material.specular", 1);
+      earthShader.setInt("material.norm", 2);
+      earthShader.setFloat("material.shininess", 0.0f);
 
       // directional light
       earthShader.setInt("dirLight.status",dirLight);
@@ -144,8 +145,9 @@ earthShader.setFloat("material.shininess", 0.0f);
       sunShader.use();
 
       model = glm::mat4(1.0f);
-      model = glm::translate(model, sunPos);
-      model = glm::scale(model, glm::vec3(0.5f));
+      model=  glm::translate(model,sunPos);
+//      model = glm::translate(model, sunPos);
+//      model = glm::scale(model, glm::vec3(0.5f));
 
       sunShader.setMat4("model", model);
 
