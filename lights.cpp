@@ -60,12 +60,12 @@ unsigned int loadTexture(const char *path);
 
 unsigned int earth_tex= loadTexture("Texture/earth.jpg");
 //unsigned int earth_spec_map=loadTexture("Texture/EarthSpec.png");
-unsigned int earth_norm_map=loadTexture("Texture/earthNormal.png");
+//unsigned int earth_norm_map=loadTexture("Texture/earthNormal.png");
 unsigned int sun_tex=loadTexture("Texture/sun.jpg");
 
 earth.texture(earth_tex);
 //earth.specular_map(earth_spec_map);
-earth.normal_map(earth_norm_map);
+//earth.normal_map(earth_norm_map);
 sun.texture(sun_tex);
 
 earthShader.use();
