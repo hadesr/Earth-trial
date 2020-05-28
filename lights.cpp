@@ -99,10 +99,10 @@ Shader earthShader("Shader/earth_vs.glsl","Shader/earth_fs.glsl");
 Shader sunShader("Shader/sun_vs.glsl","Shader/sun_fs.glsl");
 Shader earth1("Shader/texturedDiffuse.vert","Shader/texturedDiffuse.frag");
 
-  	  earth1.use();
-  	  earth1.setInt("diffuseSampler", 0);
-  	  earth1.setInt("normalSampler", 1);
-  	  //earth1.setInt("specularSampler",2);
+earth1.use();
+earth1.setInt("diffuseSampler", 0);
+earth1.setInt("normalSampler", 1);
+//earth1.setInt("specularSampler",2);
       
 
 Sphere earth(2);
@@ -111,14 +111,7 @@ Sphere sun(1);
 unsigned int loadTexture(const char *path);
 
 unsigned int earth_tex= loadTexture("Texture/Albedo.jpg");
-//unsigned int earth_spec_map=loadTexture("Texture/EarthSpec.png");
 unsigned int earth_norm_map=loadTexture("Texture/earth_normalmap.png");
-unsigned int sun_tex=loadTexture("Texture/sun.jpg");
-
-earth.texture(earth_tex);
-//earth.specular_map(earth_spec_map);
-earth.normal_map(earth_norm_map);
-sun.texture(sun_tex);
 
 const glm::vec4 white(1);
 const glm::vec4 black(0);
@@ -175,24 +168,21 @@ Shader skyShader("Shader/sky_vs.glsl","Shader/sky_fs.glsl");
       sunShader.setMat4("view", view);
 
       sun.draw();
-      
+
+      earth1.use();
+
       model = glm::mat4(1.0f);
       model = glm::translate(model, earthPos);
 //      glm::mat4 modelMatrix = glm::vec3(90,0,0);
-
-
-      earth1.use();
 
       earth1.setMat4("model", model);
       earth1.setMat4("projection", projection);
       earth1.setMat4("view", view);
 
-
       glm::vec4 eyePosW = glm::vec4(camera.Position, 1 );
+
       earth1.setVec4("EyePosW",eyePosW);
-
       earth1.setVec4("LightPosW",glm::vec4(sunPos,1));
-
       earth1.setVec4("LightColor",white);
 
       earth1.setVec4("MaterialEmissive",black);
@@ -202,6 +192,10 @@ Shader skyShader("Shader/sky_vs.glsl","Shader/sky_fs.glsl");
 
       earth1.setInt("np", np);
 
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, earth_tex);
+      glActiveTexture(GL_TEXTURE1);
+      glBindTexture(GL_TEXTURE_2D, earth_norm_map);
 
       earth.draw();
 

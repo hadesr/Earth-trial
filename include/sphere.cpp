@@ -1,15 +1,8 @@
 class Sphere
 {
     public:
-    GLuint sphere_vbo[5];//={-1,-1,-1,-1};
-    GLuint sphere_vao[5];//={-1,-1,-1,-1};
-
-	unsigned int texture_ava = 0;
-	unsigned int tex_map;
-	unsigned int spec_ava = 0;
-	unsigned int spec_map;
-	unsigned int norm_ava = 0;
-	unsigned int norm_map;
+    GLuint sphere_vbo[5];
+    GLuint sphere_vao[5];
 
 	unsigned int stack=100;
 	unsigned int sector=100;
@@ -108,74 +101,21 @@ class Sphere
 			glDisableVertexAttribArray(4);
         }
 
-    void texture(unsigned int m)
-    {   
-        tex_map=m;
-        texture_ava=1;
-    }
-
-    void specular_map(unsigned int m)
-    {
-        spec_map=m;
-        spec_ava=1;
-    }
-
-    void normal_map(unsigned int m)
-    {
-    	norm_map=m;
-    	norm_ava = 1;
-    }    
-
     void sphere_draw()
         {
         	glEnable(GL_CULL_FACE);
         	glFrontFace(GL_CCW);
-        	//glEnable(GL_LIGHTING);
-        	//glEnable(GL_LIGHT0);
     
         	glBindVertexArray(sphere_vao[0]);
-    	//  glDrawArrays(GL_POINTS,0,sizeof(sphere_pos)/sizeof(GLfloat));                   // POINTS ... no indices for debug
-        
-        	if(texture_ava)
-        	{
-        		glActiveTexture(GL_TEXTURE0);
-        		glBindTexture(GL_TEXTURE_2D, tex_map);        		
-        	}
 
-        	if(norm_ava)
-            {
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, norm_map);
-            }
-            
-            if(spec_ava)
-        	{
-            	glActiveTexture(GL_TEXTURE2);
-            	glBindTexture(GL_TEXTURE_2D, spec_map);
-        	}
-
-        	
-			glDrawElements(GL_TRIANGLES,sizeof(indi)/sizeof(GLuint),GL_UNSIGNED_INT,0);    // indices (choose just one line not both !!!)
+			glDrawElements(GL_TRIANGLES,sizeof(indi)/sizeof(GLuint),GL_UNSIGNED_INT,0);
         	glBindVertexArray(0);
         }
     
     void draw()
-        {
-    
-        //float aspect=1;;
-        //glMatrixMode(GL_PROJECTION);
-        //glLoadIdentity();
-        //gluPerspective(60.0/aspect,aspect,0.1,100.0);
-        //glMatrixMode(GL_TEXTURE);
-        //glLoadIdentity();
-        //glMatrixMode(GL_MODELVIEW);
-        //glLoadIdentity();
-        //glTranslatef(0.0,0.0,-10.0);
-    
+        {   
         	glEnable(GL_DEPTH_TEST);
-//        	glDisable(GL_TEXTURE_2D);
         	sphere_draw();
-    
         }
     
     void exit()
@@ -183,5 +123,4 @@ class Sphere
         	glDeleteVertexArrays(5,sphere_vao);
         	glDeleteBuffers(5,sphere_vbo);
         }
-        
 };
