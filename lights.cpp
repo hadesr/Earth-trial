@@ -52,6 +52,7 @@ glm::vec3 earthPos(1.0f, 1.0f, 1.0f);
 
 Shader earthShader("Shader/earth_vs.glsl","Shader/earth_fs.glsl");
 Shader sunShader("Shader/sun_vs.glsl","Shader/sun_fs.glsl");
+Shader earth1("Shader/texturedDiffuse.vert","Shader/texturedDiffuse.frag");
 
 Sphere earth(2);
 Sphere sun(1);
@@ -67,6 +68,11 @@ earth.texture(earth_tex);
 //earth.specular_map(earth_spec_map);
 //earth.normal_map(earth_norm_map);
 sun.texture(sun_tex);
+
+const glm::vec4 white(1);
+const glm::vec4 black(0);
+const glm::vec4 ambient( 0.1f, 0.1f, 0.1f, 1.0f );
+
 
   while (glfwWindowShouldClose(window) == 0)
     { 
@@ -84,77 +90,43 @@ sun.texture(sun_tex);
       glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
       glm::mat4 view = camera.GetViewMatrix();
       glm::mat4 model = glm::mat4(1.0f);
-      
-      model = glm::mat4(1.0f);
-      model = glm::translate(model, earthPos);
-          
-      earthShader.use();
-
-      earthShader.setMat4("model", model);
-      earthShader.setMat4("projection", projection);
-      earthShader.setMat4("view", view);
-
-
-//      earthShader.setVec3("direction", sunDir);
-//      earthShader.setVec3("cpos", camera.Position);
-//      earthShader.setVec3("ligpos", camera.Position);
-      
-      //material properties
-      earthShader.setInt("material.diffuse", 0);
-      earthShader.setInt("material.specular", 1);
-      earthShader.setInt("material.norm", 2);
-      earthShader.setFloat("material.shininess", 0.0f);
-
-      // directional light
-      earthShader.setInt("dirLight.status",dirLight);
-      earthShader.setVec3("dirLight.direction", sunDir);
-      earthShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-      earthShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-      earthShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-
-      // point light
-      earthShader.setInt("pointLight.status", pointLight);
-      earthShader.setVec3("pointLight.position", sunPos);
-      earthShader.setVec3("pointLight.ambient", 0.05f, 0.05f, 0.05f);
-      earthShader.setVec3("pointLight.diffuse", 0.8f, 0.8f, 0.8f);
-      earthShader.setVec3("pointLight.specular", 1.0f, 1.0f, 1.0f);
-      earthShader.setFloat("pointLight.constant", 1.0f);
-      earthShader.setFloat("pointLight.linear", 0.09);
-      earthShader.setFloat("pointLight.quadratic", 0.032);
-
-      // spotLight
-      earthShader.setInt("spotLight.status", spotLight);
-      earthShader.setVec3("spotLight.position", camera.Position);
-      earthShader.setVec3("spotLight.direction", camera.Front);
-      earthShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-      earthShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
-      earthShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-      earthShader.setFloat("spotLight.constant", 1.0f);
-      earthShader.setFloat("spotLight.linear", 0.09);
-      earthShader.setFloat("spotLight.quadratic", 0.032);
-      earthShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
-      earthShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));     
-      
-      earthShader.setVec3("viewPos", camera.Position);
-
-      earthShader.setInt("blinn", blinn);
-      earthShader.setInt("np", np);
-
-      earth.draw();
 
       sunShader.use();
 
       model = glm::mat4(1.0f);
       model=  glm::translate(model,sunPos);
-//      model = glm::translate(model, sunPos);
-//      model = glm::scale(model, glm::vec3(0.5f));
 
       sunShader.setMat4("model", model);
-
       sunShader.setMat4("projection", projection);
       sunShader.setMat4("view", view);
 
       sun.draw();
+      
+      model = glm::mat4(1.0f);
+      model = glm::translate(model, earthPos);
+//      glm::mat4 modelMatrix = glm::vec3(90,0,0);
+
+
+      earth1.use();
+
+      earth1.setMat4("model", model);
+      earth1.setMat4("projection", projection);
+      earth1.setMat4("view", view);
+
+
+      glm::vec4 eyePosW = glm::vec4(camera.Position, 1 );
+      earth1.setVec4("EyePosW",eyePosW);
+
+      earth1.setVec4("LightPosW",glm::vec4(sunPos,1));
+
+      earth1.setVec4("LightColor",white);
+
+      earth1.setVec4("MaterialEmissive",black);
+      earth1.setVec4("MaterialDiffuse",white);
+      earth1.setVec4("MaterialSpecular",white);
+      earth1.setFloat("MaterialShininess",50.0f);
+
+      earth.draw();
 
 
       glfwSwapBuffers(window);
