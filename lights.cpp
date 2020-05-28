@@ -97,13 +97,11 @@ glm::vec3 earthPos(1.0f, 1.0f, 1.0f);
 
 Shader earthShader("Shader/earth_vs.glsl","Shader/earth_fs.glsl");
 Shader sunShader("Shader/sun_vs.glsl","Shader/sun_fs.glsl");
-Shader earth1("Shader/texturedDiffuse.vert","Shader/texturedDiffuse.frag");
 
-earth1.use();
-earth1.setInt("diffuseSampler", 0);
-earth1.setInt("normalSampler", 1);
-//earth1.setInt("specularSampler",2);
-      
+earthShader.use();
+earthShader.setInt("diffuseSampler", 0);
+earthShader.setInt("normalSampler", 1);
+earthShader.setInt("nightSampler",2);
 
 Sphere earth(2);
 Sphere sun(1);
@@ -112,6 +110,7 @@ unsigned int loadTexture(const char *path);
 
 unsigned int earth_tex= loadTexture("Texture/Albedo.jpg");
 unsigned int earth_norm_map=loadTexture("Texture/earth_normalmap.png");
+unsigned int earth_night_map=loadTexture("Texture/earth_nightmap.jpg");
 
 const glm::vec4 white(1);
 const glm::vec4 black(0);
@@ -140,8 +139,7 @@ unsigned int cubemapTexture = loadCubemap(faces);
 
 Shader skyShader("Shader/sky_vs.glsl","Shader/sky_fs.glsl");
 
-
-  while (glfwWindowShouldClose(window) == 0)
+while (glfwWindowShouldClose(window) == 0)
     { 
       //
       float currentFrame = glfwGetTime();
@@ -169,33 +167,35 @@ Shader skyShader("Shader/sky_vs.glsl","Shader/sky_fs.glsl");
 
       sun.draw();
 
-      earth1.use();
+      earthShader.use();
 
       model = glm::mat4(1.0f);
       model = glm::translate(model, earthPos);
 //      glm::mat4 modelMatrix = glm::vec3(90,0,0);
 
-      earth1.setMat4("model", model);
-      earth1.setMat4("projection", projection);
-      earth1.setMat4("view", view);
+      earthShader.setMat4("model", model);
+      earthShader.setMat4("projection", projection);
+      earthShader.setMat4("view", view);
 
       glm::vec4 eyePosW = glm::vec4(camera.Position, 1 );
 
-      earth1.setVec4("EyePosW",eyePosW);
-      earth1.setVec4("LightPosW",glm::vec4(sunPos,1));
-      earth1.setVec4("LightColor",white);
+      earthShader.setVec4("EyePosW",eyePosW);
+      earthShader.setVec4("LightPosW",glm::vec4(sunPos,1));
+      earthShader.setVec4("LightColor",white);
 
-      earth1.setVec4("MaterialEmissive",black);
-      earth1.setVec4("MaterialDiffuse",white);
-      earth1.setVec4("MaterialSpecular",white);
-      earth1.setFloat("MaterialShininess",50.0f);
+      earthShader.setVec4("MaterialEmissive",black);
+      earthShader.setVec4("MaterialDiffuse",white);
+      earthShader.setVec4("MaterialSpecular",white);
+      earthShader.setFloat("MaterialShininess",50.0f);
 
-      earth1.setInt("np", np);
+      earthShader.setInt("np", np);
 
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, earth_tex);
       glActiveTexture(GL_TEXTURE1);
       glBindTexture(GL_TEXTURE_2D, earth_norm_map);
+      glActiveTexture(GL_TEXTURE2);
+      glBindTexture(GL_TEXTURE_2D, earth_night_map);
 
       earth.draw();
 
