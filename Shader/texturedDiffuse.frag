@@ -17,6 +17,11 @@ uniform float MaterialShininess;
 uniform vec4 Ambient; // Global ambient contribution.
 
 uniform sampler2D diffuseSampler;
+uniform sampler2D normalSampler;
+//uniform sampler2D specularSampler;
+
+uniform bool np;
+
 
 layout (location=0) out vec4 out_color;
 
@@ -26,7 +31,16 @@ void main()
     vec4 Emissive = MaterialEmissive;
 
     // Compute the diffuse term.
+
     vec4 N = normalize( Normal );
+
+    if(np){
+    	vec3 Nm = texture(normalSampler, TexCoords).rgb;
+    	Nm = Nm * 2.0 - 1.0;
+	Nm = normalize(TBN * Nm);
+    	N = vec4(Nm,0);
+    }
+
     vec4 L = normalize( LightPosW - FragPos );
     float NdotL = max( dot( N, L ), 0 );
     vec4 Diffuse =  NdotL * LightColor * MaterialDiffuse;

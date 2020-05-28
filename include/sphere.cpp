@@ -142,18 +142,19 @@ class Sphere
         		glBindTexture(GL_TEXTURE_2D, tex_map);        		
         	}
 
-        	if(spec_ava)
+        	if(norm_ava)
+            {
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, norm_map);
+            }
+            
+            if(spec_ava)
         	{
-            	glActiveTexture(GL_TEXTURE1);
+            	glActiveTexture(GL_TEXTURE2);
             	glBindTexture(GL_TEXTURE_2D, spec_map);
         	}
 
-        	if(norm_ava)
-        	{
-            	glActiveTexture(GL_TEXTURE2);
-            	glBindTexture(GL_TEXTURE_2D, norm_map);
-        	}
-			
+        	
 			glDrawElements(GL_TRIANGLES,sizeof(indi)/sizeof(GLuint),GL_UNSIGNED_INT,0);    // indices (choose just one line not both !!!)
         	glBindVertexArray(0);
         }

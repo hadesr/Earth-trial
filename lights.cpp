@@ -99,19 +99,25 @@ Shader earthShader("Shader/earth_vs.glsl","Shader/earth_fs.glsl");
 Shader sunShader("Shader/sun_vs.glsl","Shader/sun_fs.glsl");
 Shader earth1("Shader/texturedDiffuse.vert","Shader/texturedDiffuse.frag");
 
+  	  earth1.use();
+  	  earth1.setInt("diffuseSampler", 0);
+  	  earth1.setInt("normalSampler", 1);
+  	  //earth1.setInt("specularSampler",2);
+      
+
 Sphere earth(2);
 Sphere sun(1);
 
 unsigned int loadTexture(const char *path);
 
-unsigned int earth_tex= loadTexture("Texture/earth.jpg");
+unsigned int earth_tex= loadTexture("Texture/Albedo.jpg");
 //unsigned int earth_spec_map=loadTexture("Texture/EarthSpec.png");
-//unsigned int earth_norm_map=loadTexture("Texture/earthNormal.png");
+unsigned int earth_norm_map=loadTexture("Texture/earth_normalmap.png");
 unsigned int sun_tex=loadTexture("Texture/sun.jpg");
 
 earth.texture(earth_tex);
 //earth.specular_map(earth_spec_map);
-//earth.normal_map(earth_norm_map);
+earth.normal_map(earth_norm_map);
 sun.texture(sun_tex);
 
 const glm::vec4 white(1);
@@ -193,6 +199,9 @@ Shader skyShader("Shader/sky_vs.glsl","Shader/sky_fs.glsl");
       earth1.setVec4("MaterialDiffuse",white);
       earth1.setVec4("MaterialSpecular",white);
       earth1.setFloat("MaterialShininess",50.0f);
+
+      earth1.setInt("np", np);
+
 
       earth.draw();
 
