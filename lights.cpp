@@ -95,6 +95,7 @@ glm::vec3 sunDir(90.0f,0.0f,0.0f);
 
 glm::vec3 earthPos(1.0f, 1.0f, 1.0f);
 
+
 Shader earthShader("Shader/earth_vs.glsl","Shader/earth_fs.glsl");
 Shader sunShader("Shader/sun_vs.glsl","Shader/sun_fs.glsl");
 
@@ -171,6 +172,10 @@ while (glfwWindowShouldClose(window) == 0)
 
       model = glm::mat4(1.0f);
       model = glm::translate(model, earthPos);
+      
+      float angle = 20.0f;
+      model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 1.0f, 2.0f));
+
 //      glm::mat4 modelMatrix = glm::vec3(90,0,0);
 
       earthShader.setMat4("model", model);
@@ -187,8 +192,6 @@ while (glfwWindowShouldClose(window) == 0)
       earthShader.setVec4("MaterialDiffuse",white);
       earthShader.setVec4("MaterialSpecular",white);
       earthShader.setFloat("MaterialShininess",50.0f);
-
-      earthShader.setInt("np", np);
 
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, earth_tex);
