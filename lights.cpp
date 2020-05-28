@@ -45,6 +45,51 @@ int main(int argc, char** argv)
 //Here beings the game
 opengl::initGL();
 
+float skyVertices[] = {
+        // positions          
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
+
 glm::vec3 sunPos(-90.0f,0.0f,0.0f);
 glm::vec3 sunDir(90.0f,0.0f,0.0f);
 
@@ -72,6 +117,29 @@ sun.texture(sun_tex);
 const glm::vec4 white(1);
 const glm::vec4 black(0);
 const glm::vec4 ambient( 0.1f, 0.1f, 0.1f, 1.0f );
+
+unsigned int skyVAO, skyVBO;
+glGenVertexArrays(1, &skyVAO);
+glGenBuffers(1, &skyVBO);
+glBindVertexArray(skyVAO);
+glBindBuffer(GL_ARRAY_BUFFER, skyVBO);
+glBufferData(GL_ARRAY_BUFFER, sizeof(skyVertices), &skyVertices, GL_STATIC_DRAW);
+glEnableVertexAttribArray(0);
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+std::vector<std::string> faces=
+{
+  "Texture/skybox/right.png",
+  "Texture/skybox/left.png",
+  "Texture/skybox/top.png",
+  "Texture/skybox/bottom.png",
+  "Texture/skybox/front.png",
+  "Texture/skybox/back.png"
+};
+
+unsigned int cubemapTexture = loadCubemap(faces);  
+
+Shader skyShader("Shader/sky_vs.glsl","Shader/sky_fs.glsl");
 
 
   while (glfwWindowShouldClose(window) == 0)
@@ -128,6 +196,17 @@ const glm::vec4 ambient( 0.1f, 0.1f, 0.1f, 1.0f );
 
       earth.draw();
 
+      glDepthFunc(GL_LEQUAL);
+      skyShader.use();
+      view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+      skyShader.setMat4("view", view);
+      skyShader.setMat4("projection", projection);
+      glBindVertexArray(skyVAO);
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+      glBindVertexArray(0);
+      glDepthFunc(GL_LESS); // set depth function back to default
 
       glfwSwapBuffers(window);
       glfwPollEvents();
