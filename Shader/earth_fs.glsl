@@ -49,14 +49,7 @@ void main()
     float NdotH = max( dot( N, H ), 0 );
     vec4 Specular = pow( RdotV, MaterialShininess ) * LightColor * MaterialSpecular;
 
-    if(dot(normalize(LightPosW-FragPos),Normal)>0)
-    {
 	out_color = ( Emissive + Ambient + Diffuse + Specular ) * texture( diffuseSampler, TexCoords );
-    }
-    else
-    {
-	out_color = ( Emissive + Ambient + Diffuse + Specular ) * texture( nightSampler, TexCoords );
-    }
 }
 
 
